@@ -21,11 +21,13 @@ def main(
             if currency == base_currency:
                 total += amount
                 continue
-            res = requests.get((BASE_URL_GOLD if currency == "XAU" else BASE_URL_EXCHANGE) + f"?int={amount}&base={currency}&to={base_currency}", headers={
+            res = requests.get((BASE_URL_GOLD if "XAU" in [currency, base_currency] else BASE_URL_EXCHANGE) + f"?int={amount}&base={currency}&to={base_currency}", headers={
                 "Authorization": API_KEY,
                 "Content-Type": "application/json"
             })
-            if currency == "XAU":
+            if base_currency == "XAU":
+                calcd = amount / float(res.json()["result"][0]["selling"])
+            elif currency == "XAU":
                 calcd = amount * float(res.json()["result"][0]["selling"])
             else:
                 calcd = float(res.json()["result"]["data"][0]["calculated"])
